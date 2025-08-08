@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { useAuth } from '../../lib/auth'
 
 export default function SignupForm() {
   const [step, setStep] = useState(1)
@@ -18,27 +19,74 @@ export default function SignupForm() {
     runningTimes: ['morning', 'evening'],
     location: ''
   })
-  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
+  const { signup, isLoading } = useAuth()
 
   const handleInputChange = (field: string, value: string | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
+  const validateStep = (currentStep: number): boolean => {
+    setError('')
+    
+    switch (currentStep) {
+      case 1:
+        if (!formData.firstName || !formData.lastName || !formData.email || !formData.password || !formData.confirmPassword) {
+          setError('Please fill in all required fields')
+          return false
+        }
+        if (formData.password !== formData.confirmPassword) {
+          setError('Passwords do not match')
+          return false
+        }
+        if (formData.password.length < 6) {
+          setError('Password must be at least 6 characters long')
+          return false
+        }
+        if (!formData.email.includes('@')) {
+          setError('Please enter a valid email address')
+          return false
+        }
+        break
+      case 2:
+        if (!formData.age) {
+          setError('Please enter your age')
+          return false
+        }
+        const age = parseInt(formData.age)
+        if (age < 18 || age > 100) {
+          setError('Age must be between 18 and 100')
+          return false
+        }
+        break
+      case 3:
+        if (!formData.location) {
+          setError('Please enter your location')
+          return false
+        }
+        break
+    }
+    return true
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
     
-    // TODO: Implement Clerk signup and Supabase user creation
-    console.log('Signup attempt:', formData)
+    if (!validateStep(step)) {
+      return
+    }
     
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false)
-      // Move to next step or complete signup
-      if (step < 3) {
-        setStep(step + 1)
-      }
-    }, 1000)
+    if (step < 3) {
+      setStep(step + 1)
+      return
+    }
+
+    // Final step - create account
+    const success = await signup(formData)
+    
+    if (!success) {
+      setError('Failed to create account. Please try again.')
+    }
   }
 
   const renderStep1 = () => (
@@ -46,7 +94,7 @@ export default function SignupForm() {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            First Name
+            First Name *
           </label>
           <input
             type="text"
@@ -59,7 +107,7 @@ export default function SignupForm() {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Last Name
+            Last Name *
           </label>
           <input
             type="text"
@@ -74,7 +122,7 @@ export default function SignupForm() {
       
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Email Address
+          Email Address *
         </label>
         <input
           type="email"
@@ -88,7 +136,7 @@ export default function SignupForm() {
       
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Password
+          Password *
         </label>
         <input
           type="password"
@@ -102,7 +150,7 @@ export default function SignupForm() {
       
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Confirm Password
+          Confirm Password *
         </label>
         <input
           type="password"
@@ -120,7 +168,7 @@ export default function SignupForm() {
     <div className="space-y-6">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Age
+          Age *
         </label>
         <input
           type="number"
@@ -211,7 +259,7 @@ export default function SignupForm() {
       
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Location (City, State)
+          Location (City, State) *
         </label>
         <input
           type="text"
@@ -270,6 +318,17 @@ export default function SignupForm() {
             ></div>
           </div>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 p-3 bg-red-50 border border-red-200 rounded-lg"
+          >
+            <p className="text-sm text-red-700">{error}</p>
+          </motion.div>
+        )}
         
         <form onSubmit={handleSubmit} className="space-y-6">
           {getStepContent()}

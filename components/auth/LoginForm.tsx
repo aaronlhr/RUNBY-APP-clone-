@@ -2,23 +2,28 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { useAuth } from '../../lib/auth'
 
 export default function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
+  const { login, isLoading } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
+    setError('')
     
-    // TODO: Implement Clerk authentication
-    console.log('Login attempt:', { email, password })
+    if (!email || !password) {
+      setError('Please fill in all fields')
+      return
+    }
+
+    const success = await login(email, password)
     
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
+    if (!success) {
+      setError('Invalid email or password. Try demo@runby.com / demo123')
+    }
   }
 
   return (
@@ -32,6 +37,15 @@ export default function LoginForm() {
           <div className="text-4xl mb-4">🏃‍♀️</div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome to RUNBY</h2>
           <p className="text-gray-600">Sign in to find your running partner</p>
+        </div>
+        
+        {/* Demo Credentials */}
+        <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+          <h3 className="text-sm font-medium text-blue-900 mb-2">Demo Credentials:</h3>
+          <div className="text-xs text-blue-700 space-y-1">
+            <p><strong>Email:</strong> demo@runby.com</p>
+            <p><strong>Password:</strong> demo123</p>
+          </div>
         </div>
         
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -62,6 +76,17 @@ export default function LoginForm() {
               required
             />
           </div>
+          
+          {/* Error Message */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-3 bg-red-50 border border-red-200 rounded-lg"
+            >
+              <p className="text-sm text-red-700">{error}</p>
+            </motion.div>
+          )}
           
           <div className="flex items-center justify-between">
             <label className="flex items-center">

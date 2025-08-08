@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { AuthProvider, useAuth } from '../lib/auth'
 import Navigation from './ui/Navigation'
 import DiscoveryPage from './matching/DiscoveryPage'
 import LoginForm from './auth/LoginForm'
@@ -11,13 +12,13 @@ import LocationServices from './mobile/LocationServices'
 
 type View = 'auth' | 'discovery' | 'matches' | 'chat' | 'profile'
 
-export default function App() {
+function AppContent() {
   const [currentView, setCurrentView] = useState<View>('auth')
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const { user, isAuthenticated, isLoading, logout } = useAuth()
 
-  const handleAuthSuccess = () => {
-    setIsAuthenticated(true)
+  // Redirect to discovery if user is authenticated
+  if (isAuthenticated && currentView === 'auth') {
     setCurrentView('discovery')
   }
 
@@ -44,52 +45,67 @@ export default function App() {
   }
 
   const renderView = () => {
-    switch (currentView) {
-      case 'auth':
-        return (
-          <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 flex items-center justify-center p-4">
-            <AnimatePresence mode="wait">
-              {authMode === 'login' ? (
-                <motion.div
-                  key="login"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <LoginForm />
-                  <div className="text-center mt-4">
-                    <button
-                      onClick={() => setAuthMode('signup')}
-                      className="text-primary-600 hover:text-primary-500 text-sm"
-                    >
-                      Don't have an account? Sign up
-                    </button>
-                  </div>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="signup"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <SignupForm />
-                  <div className="text-center mt-4">
-                    <button
-                      onClick={() => setAuthMode('login')}
-                      className="text-primary-600 hover:text-primary-500 text-sm"
-                    >
-                      Already have an account? Sign in
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+    // Show loading state
+    if (isLoading) {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading RUNBY...</p>
           </div>
-        )
+        </div>
+      )
+    }
 
+    // Show authentication if not logged in
+    if (!isAuthenticated) {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 flex items-center justify-center p-4">
+          <AnimatePresence mode="wait">
+            {authMode === 'login' ? (
+              <motion.div
+                key="login"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <LoginForm />
+                <div className="text-center mt-4">
+                  <button
+                    onClick={() => setAuthMode('signup')}
+                    className="text-primary-600 hover:text-primary-500 text-sm"
+                  >
+                    Don't have an account? Sign up
+                  </button>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="signup"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <SignupForm />
+                <div className="text-center mt-4">
+                  <button
+                    onClick={() => setAuthMode('login')}
+                    className="text-primary-600 hover:text-primary-500 text-sm"
+                  >
+                    Already have an account? Sign in
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )
+    }
+
+    // Show main app views
+    switch (currentView) {
       case 'discovery':
         return <DiscoveryPage />
 
@@ -144,22 +160,22 @@ export default function App() {
                     <div className="w-24 h-24 bg-primary-200 rounded-full mx-auto mb-4 flex items-center justify-center">
                       <span className="text-3xl">👤</span>
                     </div>
-                    <h2 className="text-xl font-semibold">John Doe</h2>
-                    <p className="text-gray-600">San Francisco, CA</p>
+                    <h2 className="text-xl font-semibold">{user?.firstName} {user?.lastName}</h2>
+                    <p className="text-gray-600">{user?.location || 'Location not set'}</p>
                   </div>
                   
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Pace</span>
-                      <span className="font-medium">8:00/mile</span>
+                      <span className="font-medium">{user?.preferredPace || 'Not set'}/mile</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Distance</span>
-                      <span className="font-medium">5K</span>
+                      <span className="font-medium">{user?.preferredDistance || 'Not set'}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Subscription</span>
-                      <span className="font-medium text-primary-600">Free</span>
+                      <span className="font-medium text-primary-600">{user?.subscriptionTier || 'Free'}</span>
                     </div>
                   </div>
                   
@@ -172,7 +188,7 @@ export default function App() {
                     </button>
                     <button 
                       onClick={() => {
-                        setIsAuthenticated(false)
+                        logout()
                         setCurrentView('auth')
                       }}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
@@ -225,5 +241,13 @@ export default function App() {
         />
       )}
     </div>
+  )
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   )
 }
