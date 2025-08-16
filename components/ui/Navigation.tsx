@@ -17,26 +17,75 @@ export default function Navigation({ activeTab, onTabChange }: NavigationProps) 
   ]
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2">
-      <div className="flex justify-around max-w-md mx-auto">
+    <div style={{
+      position: 'fixed',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      backdropFilter: 'blur(20px)',
+      borderTop: '1px solid rgba(229, 231, 235, 0.5)',
+      padding: '16px 0 24px 0',
+      zIndex: 1000,
+      boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.1)'
+    }}>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        maxWidth: '400px',
+        margin: '0 auto',
+        padding: '0 20px'
+      }}>
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
-            className="flex flex-col items-center py-2 px-3 rounded-lg transition-colors relative"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              padding: '12px 16px',
+              borderRadius: '16px',
+              transition: 'all 0.2s ease',
+              position: 'relative',
+              border: 'none',
+              background: 'none',
+              cursor: 'pointer',
+              minWidth: '60px'
+            }}
           >
             {activeTab === tab.id && (
               <motion.div
                 layoutId="activeTab"
-                className="absolute inset-0 bg-primary-100 rounded-lg"
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                  borderRadius: '16px',
+                  border: '1px solid rgba(37, 99, 235, 0.2)'
+                }}
                 initial={false}
                 transition={{ type: "spring", stiffness: 500, damping: 30 }}
               />
             )}
-            <span className="text-xl mb-1 relative z-10">{tab.icon}</span>
-            <span className={`text-xs font-medium relative z-10 ${
-              activeTab === tab.id ? 'text-primary-600' : 'text-gray-500'
-            }`}>
+            <span style={{
+              fontSize: '24px',
+              marginBottom: '4px',
+              position: 'relative',
+              zIndex: 10,
+              filter: activeTab === tab.id ? 'drop-shadow(0 2px 4px rgba(37, 99, 235, 0.3))' : 'none'
+            }}>
+              {tab.icon}
+            </span>
+            <span style={{
+              fontSize: '12px',
+              fontWeight: '600',
+              position: 'relative',
+              zIndex: 10,
+              color: activeTab === tab.id ? '#2563eb' : '#6b7280',
+              transition: 'color 0.2s ease'
+            }}>
               {tab.label}
             </span>
           </button>

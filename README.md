@@ -120,7 +120,7 @@ runby-app/
    ```
 
 3. **Start the development server**
-   ```bash
+```bash
    npm run dev
    ```
 

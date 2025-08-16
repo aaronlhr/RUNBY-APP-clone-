@@ -1,0 +1,16 @@
+
+> runby-app@1.0.0 dev
+> next dev -p 4000 -H 0.0.0.0 -p 4001
+
+  ▲ Next.js 14.2.31
+  - Local:        http://localhost:4001
+  - Network:      http://0.0.0.0:4001
+  - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 19.7s
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 2.1s (189 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 10.3s (834 modules)
+ GET / 307 in 11786ms

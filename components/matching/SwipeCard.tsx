@@ -31,38 +31,139 @@ export default function SwipeCard({ user, onSwipe }: SwipeCardProps) {
 
   return (
     <motion.div
-      className="w-80 h-96 bg-white rounded-2xl shadow-xl overflow-hidden cursor-grab active:cursor-grabbing"
-      style={{ x, rotate, opacity }}
+      style={{
+        width: '100%',
+        maxWidth: '400px',
+        height: '600px',
+        margin: '0 auto',
+        borderRadius: '20px',
+        overflow: 'hidden',
+        backgroundColor: 'white',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
+        border: '1px solid #e5e7eb',
+        cursor: 'grab',
+        position: 'relative',
+        x,
+        rotate,
+        opacity
+      }}
       drag="x"
       dragConstraints={{ left: 0, right: 0 }}
       onDragEnd={handleDragEnd}
       whileDrag={{ scale: 1.05 }}
     >
-      <div className="h-full flex flex-col">
-        <div className="flex-1 relative">
+      <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ flex: 1, position: 'relative' }}>
           <img
             src={user.photo}
             alt={user.name}
-            className="w-full h-full object-cover"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover'
+            }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(transparent, rgba(0,0,0,0.7))'
+          }} />
         </div>
         
-        <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-          <h3 className="text-xl font-bold mb-2">
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          padding: '20px',
+          color: 'white'
+        }}>
+          <h3 style={{
+            fontSize: '28px',
+            fontWeight: '700',
+            margin: '0 0 12px 0',
+            textShadow: '0 2px 4px rgba(0,0,0,0.3)'
+          }}>
             {user.name}, {user.age}
           </h3>
-          <div className="flex items-center space-x-2 mb-2">
-            <span className="bg-blue-500 px-2 py-1 rounded-full text-xs">
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            marginBottom: '12px',
+            flexWrap: 'wrap'
+          }}>
+            <span style={{
+              backgroundColor: 'rgba(59, 130, 246, 0.9)',
+              padding: '6px 12px',
+              borderRadius: '20px',
+              fontSize: '12px',
+              fontWeight: '600',
+              backdropFilter: 'blur(10px)'
+            }}>
               🏃‍♂️ {user.pace}/mile
             </span>
-            <span className="bg-green-500 px-2 py-1 rounded-full text-xs">
+            <span style={{
+              backgroundColor: 'rgba(16, 185, 129, 0.9)',
+              padding: '6px 12px',
+              borderRadius: '20px',
+              fontSize: '12px',
+              fontWeight: '600',
+              backdropFilter: 'blur(10px)'
+            }}>
               📏 {user.distance} miles
             </span>
           </div>
-          <p className="text-sm opacity-90 line-clamp-2">{user.bio}</p>
+          <p style={{
+            fontSize: '14px',
+            opacity: 0.9,
+            lineHeight: '1.5',
+            margin: 0,
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden'
+          }}>
+            {user.bio}
+          </p>
         </div>
       </div>
+
+      {/* Swipe Indicators */}
+      <motion.div
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: '20px',
+          transform: 'translateY(-50%)',
+          fontSize: '48px',
+          color: '#ef4444',
+          opacity: 0,
+          pointerEvents: 'none',
+          textShadow: '0 4px 8px rgba(0,0,0,0.3)'
+        }}
+        animate={{ opacity: [0, 0.8, 0] }}
+        transition={{ duration: 0.5, repeat: Infinity }}
+      >
+        ✕
+      </motion.div>
+      <motion.div
+        style={{
+          position: 'absolute',
+          top: '50%',
+          right: '20px',
+          transform: 'translateY(-50%)',
+          fontSize: '48px',
+          color: '#10b981',
+          opacity: 0,
+          pointerEvents: 'none',
+          textShadow: '0 4px 8px rgba(0,0,0,0.3)'
+        }}
+        animate={{ opacity: [0, 0.8, 0] }}
+        transition={{ duration: 0.5, repeat: Infinity, delay: 0.25 }}
+      >
+        ♥
+      </motion.div>
     </motion.div>
   )
 }

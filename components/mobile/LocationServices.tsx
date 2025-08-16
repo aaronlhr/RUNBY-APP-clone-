@@ -116,25 +116,46 @@ export default function LocationServices({ onLocationUpdate, onPermissionGranted
   }
 
   return (
-    <div className="space-y-4">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       {/* Location Status */}
-      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-        <div className="flex items-center space-x-3">
-          <div className={`w-3 h-3 rounded-full ${
-            permission === 'granted' ? 'bg-green-500' : 
-            permission === 'denied' ? 'bg-red-500' : 
-            'bg-yellow-500'
-          }`} />
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '16px',
+        backgroundColor: '#f9fafb',
+        borderRadius: '8px'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{
+            width: '12px',
+            height: '12px',
+            borderRadius: '50%',
+            backgroundColor: permission === 'granted' ? '#10b981' : 
+                             permission === 'denied' ? '#ef4444' : '#f59e0b'
+          }} />
           <div>
-            <p className="font-medium text-gray-900">Location Services</p>
-            <p className={`text-sm ${getLocationStatusColor()}`}>
+            <p style={{ fontWeight: '500', color: '#111827' }}>Location Services</p>
+            <p style={{ 
+              fontSize: '14px', 
+              color: permission === 'granted' ? '#059669' : 
+                     permission === 'denied' ? '#dc2626' : 
+                     permission === 'prompt' ? '#d97706' : '#6b7280'
+            }}>
               {getLocationStatusText()}
             </p>
           </div>
         </div>
         
         {isLoading && (
-          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-600" />
+          <div style={{
+            width: '20px',
+            height: '20px',
+            border: '2px solid transparent',
+            borderTop: '2px solid #2563eb',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite'
+          }} />
         )}
       </div>
 
@@ -143,11 +164,15 @@ export default function LocationServices({ onLocationUpdate, onPermissionGranted
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-4 bg-primary-50 rounded-lg"
+          style={{
+            padding: '16px',
+            backgroundColor: '#eff6ff',
+            borderRadius: '8px'
+          }}
         >
-          <h3 className="font-medium text-primary-900 mb-2">Current Location</h3>
-          <div className="text-sm text-primary-700 space-y-1">
-            <p><strong>Latitude:</strong> {location.lat.toFixed(6)}</p>
+          <h3 style={{ fontWeight: '500', color: '#1e40af', marginBottom: '8px' }}>Current Location</h3>
+          <div style={{ fontSize: '14px', color: '#1d4ed8' }}>
+            <p style={{ marginBottom: '4px' }}><strong>Latitude:</strong> {location.lat.toFixed(6)}</p>
             <p><strong>Longitude:</strong> {location.lng.toFixed(6)}</p>
           </div>
         </motion.div>
@@ -158,32 +183,56 @@ export default function LocationServices({ onLocationUpdate, onPermissionGranted
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-4 bg-red-50 border border-red-200 rounded-lg"
+          style={{
+            padding: '16px',
+            backgroundColor: '#fef2f2',
+            border: '1px solid #fecaca',
+            borderRadius: '8px'
+          }}
         >
-          <p className="text-sm text-red-700">{error}</p>
+          <p style={{ fontSize: '14px', color: '#dc2626' }}>{error}</p>
         </motion.div>
       )}
 
       {/* Action Buttons */}
-      <div className="space-y-2">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {permission === 'prompt' && (
           <button
             onClick={requestLocationPermission}
             disabled={isLoading}
-            className="w-full btn-primary disabled:opacity-50"
+            style={{
+              width: '100%',
+              backgroundColor: '#2563eb',
+              color: 'white',
+              fontWeight: '600',
+              padding: '12px',
+              borderRadius: '8px',
+              border: 'none',
+              cursor: isLoading ? 'not-allowed' : 'pointer',
+              opacity: isLoading ? 0.5 : 1
+            }}
           >
             {isLoading ? 'Getting Location...' : 'Enable Location Services'}
           </button>
         )}
         
         {permission === 'denied' && (
-          <div className="text-center">
-            <p className="text-sm text-gray-600 mb-3">
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '12px' }}>
               Location access is required to find running partners near you.
             </p>
             <button
-              onClick={() => window.open('chrome://settings/content/location', '_blank')}
-              className="text-sm text-primary-600 hover:text-primary-500 underline"
+              onClick={() => {
+                alert('Please enable location services in your browser settings to find running partners near you.')
+              }}
+              style={{
+                fontSize: '14px',
+                color: '#2563eb',
+                textDecoration: 'underline',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer'
+              }}
             >
               Open Browser Settings
             </button>
@@ -194,7 +243,16 @@ export default function LocationServices({ onLocationUpdate, onPermissionGranted
           <button
             onClick={getCurrentLocation}
             disabled={isLoading}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            style={{
+              width: '100%',
+              padding: '12px',
+              border: '1px solid #d1d5db',
+              borderRadius: '8px',
+              color: '#374151',
+              backgroundColor: 'white',
+              cursor: isLoading ? 'not-allowed' : 'pointer',
+              opacity: isLoading ? 0.5 : 1
+            }}
           >
             {isLoading ? 'Updating...' : 'Refresh Location'}
           </button>
@@ -202,12 +260,16 @@ export default function LocationServices({ onLocationUpdate, onPermissionGranted
       </div>
 
       {/* Location Benefits */}
-      <div className="p-4 bg-blue-50 rounded-lg">
-        <h3 className="font-medium text-blue-900 mb-2">Why Location Access?</h3>
-        <ul className="text-sm text-blue-700 space-y-1">
-          <li>• Find running partners in your area</li>
-          <li>• Discover popular running routes nearby</li>
-          <li>• Join local running groups and events</li>
+      <div style={{
+        padding: '16px',
+        backgroundColor: '#eff6ff',
+        borderRadius: '8px'
+      }}>
+        <h3 style={{ fontWeight: '500', color: '#1e40af', marginBottom: '8px' }}>Why Location Access?</h3>
+        <ul style={{ fontSize: '14px', color: '#1d4ed8' }}>
+          <li style={{ marginBottom: '4px' }}>• Find running partners in your area</li>
+          <li style={{ marginBottom: '4px' }}>• Discover popular running routes nearby</li>
+          <li style={{ marginBottom: '4px' }}>• Join local running groups and events</li>
           <li>• Get accurate distance calculations</li>
         </ul>
       </div>

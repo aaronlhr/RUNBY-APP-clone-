@@ -1,5 +1,6 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import { ClerkProvider } from '@clerk/nextjs'
 
 export const metadata: Metadata = {
   title: 'RUNBY - Find Your Running Partner',
@@ -48,13 +49,6 @@ export const metadata: Metadata = {
     },
   },
   manifest: '/manifest.json',
-  themeColor: '#0ea5e9',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
@@ -69,6 +63,14 @@ export const metadata: Metadata = {
     'msapplication-TileColor': '#0ea5e9',
     'msapplication-config': '/browserconfig.xml',
   },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: '#0ea5e9',
 }
 
 export default function RootLayout({
@@ -94,7 +96,39 @@ export default function RootLayout({
         <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
       </head>
       <body className="antialiased">
-        {children}
+        <ClerkProvider
+          appearance={{
+            baseTheme: undefined,
+            variables: {
+              colorPrimary: '#2563eb',
+              colorBackground: '#ffffff',
+              colorInputBackground: '#ffffff',
+              colorInputText: '#1f2937',
+              colorText: '#1f2937',
+              colorTextSecondary: '#6b7280',
+              borderRadius: '8px',
+              fontFamily: 'Inter, system-ui, sans-serif',
+            },
+            elements: {
+              rootBox: 'mx-auto',
+              card: 'shadow-xl border-0 rounded-lg',
+              headerTitle: 'text-2xl font-bold text-gray-900',
+              headerSubtitle: 'text-gray-600',
+              formButtonPrimary: 'bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors w-full',
+              formFieldInput: 'border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full',
+              footerActionLink: 'text-blue-600 hover:text-blue-700 font-medium',
+              formFieldLabel: 'text-sm font-medium text-gray-700 mb-1',
+              formFieldLabelRow: 'mb-2',
+              dividerLine: 'bg-gray-200',
+              dividerText: 'text-gray-500 text-sm',
+              socialButtonsBlockButton: 'border border-gray-300 rounded-lg px-4 py-2 hover:bg-gray-50 transition-colors',
+              socialButtonsBlockButtonText: 'text-gray-700 font-medium',
+            },
+          }}
+          publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY!}
+        >
+          {children}
+        </ClerkProvider>
         
         {/* PWA Service Worker Registration */}
         <script
